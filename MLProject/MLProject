@@ -1,6 +1,4 @@
-name: heartdisease_ci_project
-
-conda_env: conda.yaml
+name: heart-disease-ci-project
 
 entry_points:
   main:
@@ -8,5 +6,8 @@ entry_points:
       data_path: {type: str, default: "dataset_HeartDisease_membangun_sistem_machine_learning_preprocessing.csv"}
       target_col: {type: str, default: "target"}
       experiment_name: {type: str, default: "CI_Retraining_HeartDisease"}
-      tracking_uri: {type: str, default: "sqlite:///mlflow.db"}
-    command: "python modelling.py --data_path {data_path} --target_col {target_col} --experiment_name {experiment_name} --tracking_uri {tracking_uri}"
+    command: >
+      python modelling.py
+      --data_path {data_path}
+      --target_col {target_col}
+      --experiment_name {experiment_name}
