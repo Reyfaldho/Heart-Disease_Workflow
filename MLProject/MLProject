@@ -5,8 +5,9 @@ conda_env: conda.yaml
 entry_points:
   main:
     parameters:
-      data_path: {type: str, default: "https://raw.githubusercontent.com/Reyfaldho/Eksperimen_SML_Reyfaldho-Alfarazel/refs/heads/main/Preprocessing/dataset_HeartDisease_membangun_sistem_machine_learning_preprocessing.csv.csv"}
+      data_path: {type: str, default: "https://raw.githubusercontent.com/Reyfaldho/Eksperimen_SML_Reyfaldho-Alfarazel/refs/heads/main/Preprocessing/dataset_HeartDisease_membangun_sistem_machine_learning_preprocessing.csv"}
       target_col: {type: str, default: "target"}
       experiment_name: {type: str, default: "CI_Retraining_HeartDisease"}
       tracking_uri: {type: str, default: "sqlite:///mlflow.db"}
     command: "python modelling.py --data_path {data_path} --target_col {target_col} --experiment_name {experiment_name} --tracking_uri {tracking_uri}"
+
