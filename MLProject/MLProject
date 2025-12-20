@@ -3,8 +3,13 @@ name: heart-disease-mlflow-project
 entry_points:
   main:
     parameters:
-      data_path: {type: str, default: "dataset_HeartDisease_membangun_sistem_machine_learning_preprocessing.csv"}
-      target_col: {type: str, default: "target"}
+      data_path:
+        type: str
+        default: dataset_HeartDisease_membangun_sistem_machine_learning_preprocessing.csv
+      target_col:
+        type: str
+        default: target
+
     command: >
       python modelling.py
       --data_path {data_path}
