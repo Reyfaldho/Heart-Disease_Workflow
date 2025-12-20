@@ -27,8 +27,11 @@ jobs:
           pip install -r MLProject/requirements.txt
 
       - name: Run MLflow Project (Retraining)
+        env:
+          MLFLOW_TRACKING_URI: sqlite:///mlflow.db
         run: |
           mlflow run ./MLProject --env-manager=local
+
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
