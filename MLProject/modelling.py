@@ -13,7 +13,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 
 def parse_args():
     p = argparse.ArgumentParser()
-    p.add_argument("--data_path", type=str, default="dataset_preprocessing.csv")
+    p.add_argument("--data_path", type=str, default="https://raw.githubusercontent.com/Reyfaldho/Eksperimen_SML_Reyfaldho-Alfarazel/refs/heads/main/Preprocessing/dataset_HeartDisease_membangun_sistem_machine_learning_preprocessing.csv.csv.csv")
     p.add_argument("--target_col", type=str, default="target")
     p.add_argument("--experiment_name", type=str, default="CI_Retraining_HeartDisease")
     p.add_argument("--tracking_uri", type=str, default="sqlite:///mlflow.db")
@@ -64,3 +64,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
