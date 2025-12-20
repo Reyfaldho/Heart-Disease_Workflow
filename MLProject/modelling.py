@@ -11,17 +11,14 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 
 
-def parse_args():
+def main():
     p = argparse.ArgumentParser()
     p.add_argument("--data_path", type=str, required=True)
     p.add_argument("--target_col", type=str, default="target")
-    p.add_argument("--experiment_name", type=str, default=None)
-    p.add_argument("--tracking_uri", type=str, default=None)
-    return p.parse_args()
+    p.add_argument("--experiment_name", type=str, default="CI_Retraining_HeartDisease")
+    args = p.parse_args()
 
-
-def main():
-    args = parse_args()
+    mlflow.set_experiment(args.experiment_name)
 
     df = pd.read_csv(args.data_path)
     X = df.drop(columns=[args.target_col, "num_original"], errors="ignore").astype("float64")
@@ -35,20 +32,20 @@ def main():
         n_estimators=300,
         random_state=42,
         n_jobs=-1,
-        class_weight="balanced"
+        class_weight="balanced",
     )
     model.fit(X_train, y_train)
 
     y_pred = model.predict(X_test)
     y_proba = model.predict_proba(X_test)[:, 1]
 
-    with mlflow.start_run(run_name="rf_train", nested=True):
-        mlflow.log_metric("accuracy", accuracy_score(y_test, y_pred))
-        mlflow.log_metric("precision", precision_score(y_test, y_pred, zero_division=0))
-        mlflow.log_metric("recall", recall_score(y_test, y_pred, zero_division=0))
-        mlflow.log_metric("f1", f1_score(y_test, y_pred, zero_division=0))
-        mlflow.log_metric("roc_auc", roc_auc_score(y_test, y_proba))
-        mlflow.sklearn.log_model(model, artifact_path="model")
+    mlflow.log_metric("accuracy", accuracy_score(y_test, y_pred))
+    mlflow.log_metric("precision", precision_score(y_test, y_pred, zero_division=0))
+    mlflow.log_metric("recall", recall_score(y_test, y_pred, zero_division=0))
+    mlflow.log_metric("f1", f1_score(y_test, y_pred, zero_division=0))
+    mlflow.log_metric("roc_auc", roc_auc_score(y_test, y_proba))
+
+    mlflow.sklearn.log_model(model, artifact_path="model")
 
 
 if __name__ == "__main__":
