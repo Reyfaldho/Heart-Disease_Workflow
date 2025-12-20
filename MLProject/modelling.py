@@ -13,8 +13,6 @@ def main():
     parser.add_argument("--target_col", type=str, required=True)
     args = parser.parse_args()
 
-    mlflow.set_experiment("CI_Retraining_HeartDisease")
-
     df = pd.read_csv(args.data_path)
 
     X = df.drop(columns=[args.target_col])
@@ -43,3 +41,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
