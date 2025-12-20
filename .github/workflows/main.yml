@@ -32,13 +32,39 @@ jobs:
         run: |
           mlflow run ./MLProject --env-manager=local
 
+      - name: Get latest MLflow run_id
+        env:
+          MLFLOW_TRACKING_URI: file:${{ github.workspace }}/mlruns
+        run: |
+          python - <<'PY'
+          import os, glob
+
+          base = "mlruns"
+          exp_dirs = [d for d in glob.glob(os.path.join(base, "*")) if os.path.isdir(d) and os.path.basename(d).isdigit()]
+          if not exp_dirs:
+              raise SystemExit("No experiment directory found in mlruns/")
+
+          latest_exp = max(exp_dirs, key=os.path.getmtime)
+
+          run_dirs = [d for d in glob.glob(os.path.join(latest_exp, "*")) if os.path.isdir(d)]
+          run_dirs = [d for d in run_dirs if os.path.basename(d) not in ("meta.yaml",)]
+          if not run_dirs:
+              raise SystemExit("No run directory found in latest experiment.")
+
+          latest_run = max(run_dirs, key=os.path.getmtime)
+          run_id = os.path.basename(latest_run)
+
+          print("Latest RUN_ID:", run_id)
+          with open(os.environ["GITHUB_ENV"], "a") as f:
+              f.write(f"RUN_ID={run_id}\n")
+          PY
+
       - name: Upload Artifacts to GitHub
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: mlruns-artifacts
           path: mlruns/
-
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -47,10 +73,14 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build Docker Image using MLflow
+        env:
+          MLFLOW_TRACKING_URI: file:${{ github.workspace }}/mlruns
         run: |
-          mlflow build-docker ./MLProject \
-            -n ${{ secrets.DOCKERHUB_USERNAME }}/heartdisease-mlflow
+          echo "Building image from RUN_ID=${{ env.RUN_ID }}"
+          mlflow models build-docker \
+            --model-uri "runs:/${{ env.RUN_ID }}/model" \
+            --name "${{ secrets.DOCKERHUB_USERNAME }}/heartdisease-mlflow:latest"
 
       - name: Push Docker Image to Docker Hub
         run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/heartdisease-mlflow
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/heartdisease-mlflow:latest
